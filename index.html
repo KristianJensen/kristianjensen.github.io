@@ -2,9 +2,103 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Hello peeps</title>
+    <script type="text/javascript" src="d3/d3.js"></script>
+	<link rel="stylesheet" href="mystyle.css">
 </head>
 <body>
-    <h1>HEJHEJHEJ</h1>
+    <h1>Nummer 1</h1>
+	<a href="SF.html">San Fransisco</a>
+    <div>Hej med dig</div>
+    <script type="text/javascript">
+        var dataset = [1, 2, 3, 4, 5];
+
+        d3.select("body").selectAll("p")
+            .data(dataset)
+            .enter()
+            .append("p")
+            .text(function(d) {return 'This is ' + d + '!'})
+            .style("color", function(d) {
+                if (d > 2) { //Threshold of 15
+                    return "red";
+                } else {
+                    return "";
+				};
+            });
+		
+		var h = 300;
+		var w = 500;
+		var margin = 30;
+			
+		
+		var dataset = [
+			[5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
+			[410, 12], [475, 44], [25, 67], [85, 21], [220, 88],
+			[600, 150]
+		];
+		var svg = d3.select("body").append("svg")
+			.attr("width", w)
+			.attr("height", h);
+		
+		var xScale = d3.scaleLinear()
+			.domain([0, d3.max(dataset, function(d) { return d[0]; })])
+			.range([margin, w-margin])
+			.nice();
+		
+		var yScale = d3.scaleLinear()
+			.domain([0, d3.max(dataset, function(d) { return d[1]; })])
+			.range([h-margin, margin])
+			.nice();
+			
+		var rScale = d3.scaleLinear()
+			.domain([0, d3.max(dataset, function(d) { return d[1]; })])
+			.range([1, 10])
+		
+		svg.selectAll("circle")
+			.data(dataset)
+			.enter()
+			.append("circle")
+			.attr("cx", function(d) { return xScale(d[0]); })
+			.attr("cy", function(d) { return yScale(d[1]); })
+			.attr("r", function(d) { return rScale(d[1]); })
+			.attr("fill", "red");
+			
+		svg.append("g")
+			.call(d3.axisBottom().scale(xScale))
+			.attr("transform", "translate(0," + (h-margin) + ")")
+			
+		svg.append("g")
+			.call(d3.axisLeft().scale(yScale))
+			.attr("transform", "translate(" + margin + ",0)")
+		
+		d3.select("h1")
+			.on("click", function() {
+				svg.selectAll("circle")
+					.transition()
+					.duration(1000)
+					.delay(function(d) { return d[0]; })
+					.ease(d3.easeQuad)
+					.attr("r", function(d) { return 12 - rScale(d[1]); })
+			});
+			
+		d3.selectAll("p")
+			.on("click", function() {
+				svg.selectAll("circle")
+					.transition()
+					.duration(1000)
+					.delay(function(d, i) { return i*100; })
+					.ease(d3.easeLinear)
+					.attr("fill", "blue")
+			})
+    </script>
+	<div>
+		<svg width="500" height="200">
+		<rect style="stroke:black;stroke-width:5px;fill-opacity:0.2" x="0" y="40" width="80" height="80" fill="purple"/>
+		<rect style="stroke:black;stroke-width:5px;fill-opacity:0.4" x="20" y="30" width="80" height="80" fill="blue"/>
+		<rect style="stroke:black;stroke-width:5px;fill-opacity:0.6" x="40" y="20" width="80" height="80" fill="green"/>
+		<rect style="stroke:black;stroke-width:5px;fill-opacity:0.8" x="60" y="10" width="80" height="80" fill="yellow"/>
+		<rect style="stroke:black;stroke-width:5px;fill-opacity:1" x="80" y="0" width="80" height="80" fill="red"/>
+		</svg>
+	</div>
 </body>
 </html>

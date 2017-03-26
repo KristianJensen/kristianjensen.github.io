@@ -2,25 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hello peeps</title>
+    <title>Assignment 2</title>
     <script type="text/javascript" src="d3/d3.js"></script>
 	<link rel="stylesheet" href="mystyle.css">
 </head>
 <body>
-	<h1>San Fransisco</h1>
+	<h1>San Fransisco - Assignment 2</h1>
 	
-	<div id="viz-one">
+	<div id="viz-one" class="viz-div">
 		<h2>Prostitution and vehicle theft in San Fransisco</h2>
 		<p>
-			This should contain the explanation of visualization 1. Bla bla bla bla.
+			The figure below shows a plot of crime data from different police districts of San Fransisco. The x-axis shows the number of prostituion cases, while the y-axis shows the number of vehicle thefts. The size of each circle corresponds to the total number of crimes within the year.
 		</p>
 		<p>
 			Click the plot to switch between years.
 		</p>
+		<div class="svg-div"></div>
+		<p>
+			The axes do not change between years. This makes it easier to see the overall difference in numbers of crimes.
+		</p>
 	
 	</div>
 	
-	<div id="viz-two">
+	<div id="viz-two" class="viz-div">
 		<h2>Visualization 2 name</h2>
 		<p>
 			This should contain the explanation of visualization 2. Bla bla bla bla.
@@ -28,63 +32,73 @@
 		
 	</div>
 	<script type="text/javascript">
-		// Visualization 1		
+		
+		// Figure size and margin
 		var h = 500;
 		var w = 800;
 		var margin = 60;
 		
-		d3.select("#viz-one").append("svg")
+		
+		// The svg for the prostitution - vehicle theft scatter plot
+		d3.select("#viz-one .svg-div").append("svg")
 			.attr("height", h)
 			.attr("width", w)
 			.attr("id", "viz-one-svg");
 			
+		// The svg for the prostitution K-means geo plot
 		d3.select("#viz-two").append("svg")
 			.attr("height", h)
 			.attr("width", w)
 			.attr("id", "viz-two-svg");
 		
+		
+		// Code for making the scatter plot:
 		d3.json("data/crime1.json", function(data) {
 			var dataset = data;
+			// Data format: {2003: [{'PROSTITUTION': x, 'VEHICLE THEFT': y, 'Total': z}, ... ],
+			//			     2015: [{'PROSTITUTION': x, 'VEHICLE THEFT': y, 'Total': z}, ... ]
+			// }
 						
+			// The maximum x value in the two years
 			var maxX = Math.max(
 				d3.max(dataset["2003"], function(d) { return d["PROSTITUTION"] }),
 				d3.max(dataset["2015"], function(d) { return d["PROSTITUTION"] })
 			)
 			
+			// The maximum y value in the two years
 			var maxY = Math.max(
 				d3.max(dataset["2003"], function(d) { return d["VEHICLE THEFT"] }),
 				d3.max(dataset["2015"], function(d) { return d["VEHICLE THEFT"] })
 			)
 			
+			// The maximum total crimes in the two years
 			var maxR = Math.max(
 				d3.max(dataset["2003"], function(d) { return d["Total"] }),
 				d3.max(dataset["2015"], function(d) { return d["Total"] })
 			)
 			
+			// Get the svg for the plot
 			var svg = d3.select("#viz-one-svg")
 			
-			svg.append("rect")
-				.attr("x", 0)
-				.attr("y", 0)
-				.attr("height", h)
-				.attr("width", w)
-				.attr("fill", "#ffffff")
 			
+			// Define the x-scale
 			var xScale = d3.scaleLinear()
 				.domain([0, maxX])
 				.range([margin, w-margin])
 				.nice();
 			
-			
+			// Define the y-scale
 			var yScale = d3.scaleLinear()
 				.domain([0, maxY])
 				.range([h-margin, margin])
 				.nice();
-				
+			
+			// Define the radius-scale
 			var rScale = d3.scaleLinear()
 				.domain([0, maxR])
 				.range([2, 7])
-				
+			
+			// Draw all the circles
 			svg.selectAll("circle")
 				.data(dataset["2003"])
 				.enter()
@@ -93,7 +107,8 @@
 				.attr("cy", function(d) { return yScale(d["VEHICLE THEFT"]); })
 				.attr("r", function(d) { return rScale(d["Total"]) })
 				.attr("fill", "orange");
-				
+			
+			// Draw the axis labels
 			svg.selectAll(".dot-label")
 				.data(dataset["2003"])
 				.enter()
@@ -104,34 +119,43 @@
 				.text(function(d) { return d["PdDistrict"] })
 				.attr("font-size", "10px")
 
+			// Draw the title for 2003
 			svg.append("text")
 				.text("2003")
 				.attr("y", h/10)
 				.attr("x", w/2)
 				.attr("id", "viz-1-title-2003")
-				
+				.style("font-size", "16px")
+				.style("font-weight", "bold")
+			
+			// Draw the title for 2015
 			svg.append("text")
 				.text("2015")
 				.attr("y", h/10)
 				.attr("x", 2*w)
 				.attr("id", "viz-1-title-2015")
+				.style("font-size", "16px")
+				.style("font-weight", "bold")
 				
-				
+			
+			// Make the axes
 			svg.append("g")
 				.call(d3.axisBottom().scale(xScale))
-				.attr("transform", "translate(0," + (h-margin) + ")");
-				
+				.attr("transform", "translate(0," + (h-margin) + ")")
+		
 			svg.append("g")
 				.call(d3.axisLeft().scale(yScale))
 				.attr("transform", "translate(" + margin + ", 0)");
-				
+			
+			// Make the axis label	
 			svg.append("text")
 				.attr("x", 0.5*w)
 				.attr("y", h-margin)
 				.attr("dy", "2.5em")
 				.attr("font-size", "14px")
 				.text("Prositution")
-				
+			
+			// Make the axis label
 			svg.append("text")
 				.attr("x", -0.6*h)
 				.attr("y", margin)
@@ -140,11 +164,16 @@
 				.attr("transform", "rotate(-90)")
 				.text("Vehicle Theft")
 				
+			// Define the on-click functionalities
+			
+			// Some state variables
 			var currentYear = "2003";
 			var x_03;
 			var x_15;
 			
+
 			svg.on("click", function() {
+				// Check what the current year is
 				if (currentYear == "2003") {
 					new_data = dataset["2015"];
 					currentYear = "2015";
@@ -156,6 +185,8 @@
 					x_03 = w/2;
 					x_15 = 2*w;
 				}
+				
+				// Move the titles
 				d3.select("#viz-1-title-2003")
 					.transition()
 					.duration(800)
@@ -166,6 +197,7 @@
 					.duration(800)
 					.attr("x", x_15);
 				
+				// Update the circles
 				svg.selectAll("circle")
 					.data(new_data)
 					.transition()
@@ -176,6 +208,7 @@
 					.attr("cy", function(d) { return yScale(d["VEHICLE THEFT"]); })
 					.attr("r", function(d) { return  rScale(d["Total"]) })
 				
+				// Update the labels
 				svg.selectAll(".dot-label")
 					.data(new_data)
 					.transition()
@@ -184,11 +217,7 @@
 					.delay(function(d, i) { return i*30 })
 					.attr("x", function(d) { return xScale(d["PROSTITUTION"]) + 10; })
 					.attr("y", function(d) { return yScale(d["VEHICLE THEFT"]); })
-					//.attr("transform", function(d) { return "rotate(-30 " + xScale(d["PROSTITUTION"]) + " " + yScale(d["VEHICLE THEFT"]) + ")"})
 			})
-			
-				
-			
 		})
 	</script>
 </body>

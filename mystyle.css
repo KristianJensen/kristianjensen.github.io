@@ -1,7 +1,21 @@
 body {
-	color: blue;
-	font-size: 16px;
-	text-align: center;
-	font-weight: bold;
+	font-size: 12px;
 	font-family: sans-serif;
+	margin: 20px;
+}
+
+h1, h2 {
+	color: blue;
+	font-weight: bold;
+	text-align: center;
+	
+}
+
+.viz-div p {
+	margin-left: 20%;
+	margin-right: 20%;
+}
+
+.svg-div {
+	text-align: center;
 }
